@@ -1,0 +1,15 @@
+# 前端依赖与打包目录
+node_modules/
+dist/
+.env.local
+
+# 后端虚拟环境或编译文件
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# 系统与环境文件
+.DS_Store
+.env
+个人博客.md

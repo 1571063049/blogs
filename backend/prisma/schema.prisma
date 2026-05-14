@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING
+  REJECTED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PlanType {
+  PERSONAL
+  WORK
+  TRAVEL
+  STUDY
+  OTHER
+}
+
+enum PlanStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  DONE
+  PAUSED
+  CANCELED
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  username     String     @unique
+  passwordHash String
+  nickname     String
+  avatarUrl    String
+  bio          String
+  role         Role       @default(USER)
+  posts        Post[]
+  comments     Comment[]
+  favorites    Favorite[]
+  reviewLogs   PostReviewLog[] @relation("ReviewerReviewLogs")
+  notifications Notification[]
+  weeklyReports WeeklyReport[]
+  plans        PersonalPlan[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String
+  posts       Post[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String    @unique
+  posts     PostTag[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Post {
+  id          Int          @id @default(autoincrement())
+  title       String
+  slug        String       @unique
+  summary     String
+  content     String
+  coverUrl    String
+  status      PostStatus   @default(DRAFT)
+  isTop       Boolean      @default(false)
+  isRecommend Boolean      @default(false)
+  viewCount   Int          @default(0)
+  reviewMessage String     @default("")
+  publishedAt DateTime?
+  authorId    Int
+  categoryId  Int
+  author      User         @relation(fields: [authorId], references: [id])
+  category    Category     @relation(fields: [categoryId], references: [id])
+  tags        PostTag[]
+  comments    Comment[]
+  favorites   Favorite[]
+  reviewLogs  PostReviewLog[]
+  notifications Notification[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model PostReviewLog {
+  id           Int        @id @default(autoincrement())
+  postId       Int
+  reviewerId   Int
+  fromStatus   PostStatus
+  toStatus     PostStatus
+  message      String     @default("")
+  post         Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reviewer     User       @relation("ReviewerReviewLogs", fields: [reviewerId], references: [id])
+  createdAt    DateTime   @default(now())
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int?
+  title     String
+  content   String
+  isRead    Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+}
+
+model PostTag {
+  postId Int
+  tagId  Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+model Comment {
+  id        Int           @id @default(autoincrement())
+  postId    Int
+  userId    Int?
+  nickname  String
+  content   String
+  status    CommentStatus @default(PENDING)
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Favorite {
+  userId    Int
+  postId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, postId])
+}
+
+model WeeklyReport {
+  id        Int      @id @default(autoincrement())
+  title     String
+  summary   String   @default("")
+  content   String
+  weekStart DateTime
+  weekEnd   DateTime
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PersonalPlan {
+  id          Int        @id @default(autoincrement())
+  title       String
+  type        PlanType   @default(PERSONAL)
+  status      PlanStatus @default(NOT_STARTED)
+  progress    Int        @default(0)
+  currentPlan String     @default("")
+  nextPlan    String     @default("")
+  content     String
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}

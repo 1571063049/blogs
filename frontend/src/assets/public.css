@@ -1,0 +1,17 @@
+
+
+.prose-blog p {
+  margin: 0 0 1rem;
+  color: var(--n-text-color-2, #475569);
+  line-height: 1.8;
+}
+
+.prose-blog h2 {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.tatistic-color .n-statistic-value__content{
+  color: #5fbc21 !important;
+}
