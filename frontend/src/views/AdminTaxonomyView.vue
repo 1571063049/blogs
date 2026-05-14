@@ -335,7 +335,7 @@ onMounted(() => {
   </section>
 </template>
 
-<style>
+<style scoped>
 .taxonomy-modal {
   max-width: 700px;
   width: 700px;

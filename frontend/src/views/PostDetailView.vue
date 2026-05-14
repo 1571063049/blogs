@@ -111,6 +111,10 @@ async function toggleFavorite() {
   justify-content: center;
 }
 
+.article-cover img{
+  width: 100% !important;
+}
+
 .article-content-card {
   margin-top: 18px;
 }

@@ -585,7 +585,7 @@ onMounted(() => {
   </section>
 </template>
 
-<style>
+<style scoped>
 .n-data-table-base-table{
   height: 700px;
   overflow: auto;

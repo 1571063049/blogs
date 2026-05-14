@@ -6,6 +6,7 @@ import {
   NButton,
   NCard,
   NEmpty,
+  NFlex,
   NGrid,
   NGridItem,
   NImage,
@@ -19,6 +20,7 @@ import {
 import { SearchOutline } from '@vicons/ionicons5'
 import { blogApi } from '../api/blog'
 import PostCard from '../components/PostCard.vue'
+import ScrollView from '../baseui/ScrollView.vue'
 import { useAuthStore } from '../stores/auth'
 import type { Category, Post, Tag } from '../types/blog'
 import { resolveAssetUrl } from '../utils/url'
@@ -35,7 +37,8 @@ const isLoading = ref(true)
 const featuredPost = computed(() => posts.value.find((post) => post.isTop) ?? posts.value[0])
 const totalViews = computed(() => posts.value.reduce((sum, post) => sum + post.viewCount, 0))
 const recommendPosts = computed(() =>
-  posts.value.filter((post) => post.isRecommend && post.slug !== featuredPost.value?.slug).slice(0, 3),
+  // posts.value.filter((post) => post.isRecommend && post.slug !== featuredPost.value?.slug).slice(0, 3),
+  posts.value.filter((post) => post.isRecommend && post.slug !== featuredPost.value?.slug)
 )
 const hotPosts = computed(() =>
   [...posts.value]
@@ -196,7 +199,8 @@ watch(() => route.fullPath, () => void loadPosts())
             </NSpace>
           </NCard>
 
-          <NGrid
+          <!-- grid布局 -->
+          <!-- <NGrid
             v-if="recommendPosts.length > 0"
             :cols="3"
             :x-gap="16"
@@ -216,7 +220,47 @@ watch(() => route.fullPath, () => void loadPosts())
                 </div>
               </RouterLink>
             </NGridItem>
-          </NGrid>
+          </NGrid> -->
+          
+          <!-- flex布局 -->
+          <!-- <div class="recommend-container">
+            <NFlex
+              v-if="recommendPosts.length > 0"
+              responsive="screen"
+              class="recommend-flex"
+            >
+              <div v-for="post in recommendPosts" :key="post.id" class="recommend-flex-item">
+                <RouterLink :to="`/posts/${post.slug}`" class="recommend-card">
+                  <NImage :src="post.coverUrl" :alt="post.title" preview-disabled object-fit="cover" class="recommend-cover" />
+                  <div class="recommend-body">
+                    <NSpace align="center" :size="8" wrap>
+                      <NTag size="small" type="success" round >推荐</NTag>
+                    </NSpace>
+                    <strong>{{ post.title }}</strong>
+                    <NText depth="3">{{ post.creator.nickname }} · {{ post.viewCount }} 次阅读</NText>
+                  </div>
+                </RouterLink>
+              </div>
+            </NFlex>
+          </div> -->
+
+          <!-- flex布局 + 滚动组件 -->
+          <ScrollView>
+            <template v-if="recommendPosts.length > 0">
+              <div v-for="post in recommendPosts" :key="post.id" class="recommend-flex-item">
+                <RouterLink :to="`/posts/${post.slug}`" class="recommend-card">
+                  <NImage :src="post.coverUrl" :alt="post.title" preview-disabled object-fit="cover" class="recommend-cover" />
+                  <div class="recommend-body">
+                    <NSpace align="center" :size="8" wrap>
+                      <NTag size="small" type="success" round >推荐</NTag>
+                    </NSpace>
+                    <strong>{{ post.title }}</strong>
+                    <NText depth="3">{{ post.creator.nickname }} · {{ post.viewCount }} 次阅读</NText>
+                  </div>
+                </RouterLink>
+              </div>
+            </template>
+          </ScrollView>
 
           <template v-if="isLoading">
             <NCard v-for="index in 3" :key="index">
@@ -358,11 +402,18 @@ watch(() => route.fullPath, () => void loadPosts())
   transition: transform 0.28s ease;
 }
 
-.recommend-grid {
-  animation: section-fade-in 0.38s ease 0.08s both;
+
+.recommend-flex-item {
+  width: 33.33%;
+  padding: 0 8px;
+  flex-wrap: wrap;
+  position: relative;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .recommend-card {
+  height: 100%;
   display: block;
   overflow: hidden;
   color: var(--n-text-color);

@@ -779,7 +779,7 @@ function escapeHtml(value: string) {
   </main>
 </template>
 
-<style>
+<style scoped>
 .workspace-page {
   max-width: 1180px;
   margin: 0 auto;

@@ -15,3 +15,26 @@
 .tatistic-color .n-statistic-value__content{
   color: #5fbc21 !important;
 }
+
+.article-cover img{
+  width: 100%;
+}
+
+.post-modal,
+.taxonomy-modal {
+  max-width: 700px;
+  width: 700px;
+}
+
+.workspace-modal {
+  width: 1200px;
+}
+
+.preview-modal {
+  max-width: 900px;
+  width: 760px;
+}
+
+.preview-modal img{
+  width: 100%;
+}
